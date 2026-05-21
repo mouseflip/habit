@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-neon-cyan: #00f3ff;
+  --color-neon-fuchsia: #ff00ff;
+  --color-lab-emerald: #10b981;
+  --color-lab-stone: #1c1917;
+}
+
+@layer base {
+  .gamer {
+    --primary: var(--color-neon-cyan);
+    --secondary: var(--color-neon-fuchsia);
+    --bg: #020617;
+    --text: #00f3ff;
+  }
+  
+  .biohacker {
+    --primary: var(--color-lab-emerald);
+    --secondary: var(--color-lab-stone);
+    --bg: #fafaf9;
+    --text: #1c1917;
+  }
+}
+
+.glass-panel {
+  @apply backdrop-blur-md border;
+  background: var(--theme-glass-bg);
+  border-color: var(--theme-glass-border);
+}
+
+.gamer .glass-panel {
+  --theme-glass-bg: rgba(15, 23, 42, 0.8);
+  --theme-glass-border: rgba(0, 243, 255, 0.2);
+}
+
+.biohacker .glass-panel {
+  --theme-glass-bg: rgba(255, 255, 255, 0.8);
+  --theme-glass-border: rgba(28, 25, 23, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.gamer .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 243, 255, 0.2);
+}
+
+/* Hide scrollbars but keep functionality */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+

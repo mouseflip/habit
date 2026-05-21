@@ -1,0 +1,11 @@
+{
+  "name": "Grit & Glow-Up: Hall of Fame",
+  "description": "A gamified habit tracker and basketball simulation. Combat procrastination with study habits, hydration goals, and workout analysis to level up your avatar from undrafted rookie to Hall of Fame legend.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

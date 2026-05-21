@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile with basketball stats, companion info, and currency.",
+      "type": "object",
+      "properties": {
+        "xp": { "type": "number" },
+        "gold": { "type": "number" },
+        "hp": { "type": "number" },
+        "level": { "type": "string" },
+        "clutchFocus": { "type": "number" },
+        "tacticalIntelligence": { "type": "number" },
+        "streak": { "type": "number" },
+        "equippedItems": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lastUpdate": { "type": "string", "format": "date-time" }
+      },
+      "required": ["xp", "gold", "hp", "level"]
+    },
+    "Habit": {
+      "title": "Habit",
+      "description": "Daily habit tracking entry.",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["study", "homework", "hydration"] },
+        "value": { "type": "number" },
+        "target": { "type": "number" },
+        "completed": { "type": "boolean" },
+        "date": { "type": "string", "format": "date" }
+      },
+      "required": ["type", "value", "target", "completed", "date"]
+    },
+    "InventoryItem": {
+      "title": "Inventory Item",
+      "description": "Items purchased in the shop.",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string" },
+        "type": { "type": "string" },
+        "name": { "type": "string" },
+        "purchasedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["itemId", "name", "purchasedAt"]
+    },
+    "LogEntry": {
+      "title": "Log Entry",
+      "description": "Workout analysis logs.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "type": { "type": "string" },
+        "score": { "type": "number" },
+        "feedbackPoints": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["timestamp", "type", "score"]
+    },
+    "StudyPlan": {
+      "title": "Study Plan",
+      "description": "Generated study plans.",
+      "type": "object",
+      "properties": {
+        "organizedNotes": { "type": "string" },
+        "studyPlan": { "type": "string" },
+        "resources": { "type": "array", "items": { "type": "object" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["organizedNotes", "studyPlan", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Primary user state and stats."
+    },
+    "/users/{userId}/habits/{habitId}": {
+      "schema": "Habit",
+      "description": "Daily habit tracking."
+    },
+    "/users/{userId}/inventory/{itemId}": {
+      "schema": "InventoryItem",
+      "description": "User's gear and items."
+    },
+    "/users/{userId}/logs/{logId}": {
+      "schema": "LogEntry",
+      "description": "Workout logs."
+    },
+    "/users/{userId}/studyPlans/{planId}": {
+      "schema": "StudyPlan",
+      "description": "Study plans."
+    }
+  }
+}

@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Global Helpers
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+
+    // User Profile Validation
+    function isValidUser(data) {
+      return data.keys().hasAll(['xp', 'gold', 'hp', 'level']) &&
+             data.xp is number && data.gold is number && data.hp is number &&
+             data.level is string &&
+             (!data.keys().hasAny(['lastUpdate']) || data.lastUpdate is string) &&
+             (!data.keys().hasAny(['clutchFocus']) || data.clutchFocus is number) &&
+             (!data.keys().hasAny(['tacticalIntelligence']) || data.tacticalIntelligence is number) &&
+             (!data.keys().hasAny(['streak']) || data.streak is number) &&
+             (!data.keys().hasAny(['equippedItems']) || data.equippedItems is list);
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUser(incoming());
+      allow update: if isOwner(userId) && isValidId(userId) && (
+        incoming().diff(existing()).affectedKeys().hasAny(['xp', 'gold', 'hp', 'level', 'clutchFocus', 'tacticalIntelligence', 'streak', 'equippedItems', 'lastUpdate'])
+      );
+
+      // Habits Subcollection
+      match /habits/{habitId} {
+        function isValidHabit(data) {
+          return data.keys().hasAll(['type', 'value', 'target', 'completed', 'date']) &&
+                 data.type in ['study', 'homework', 'hydration'] &&
+                 data.value is number && data.target is number &&
+                 data.completed is bool && data.date is string;
+        }
+        allow list: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidHabit(incoming());
+      }
+
+      // Inventory Subcollection
+      match /inventory/{itemId} {
+        function isValidItem(data) {
+          return data.keys().hasAll(['itemId', 'name', 'purchasedAt']) &&
+                 data.itemId is string && data.name is string && data.purchasedAt is string;
+        }
+        allow list: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidItem(incoming());
+      }
+
+      // Logs Subcollection
+      match /logs/{logId} {
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId);
+      }
+
+      // Study Plans Subcollection
+      match /studyPlans/{planId} {
+        allow list: if isOwner(userId);
+        allow get: if isOwner(userId);
+        allow create: if isOwner(userId);
+      }
+    }
+  }
+}
