@@ -14,6 +14,23 @@ export default function AvatarPage() {
     { label: 'Energy Speed', value: 85, icon: Zap, color: 'text-yellow-400' },
   ];
 
+  // Experience & Rank calculations according to slide
+  const xp = userData?.xp || 0;
+  const level = Math.floor(xp / 1000) + 1;
+  
+  let rank = 'Undrafted Scrub';
+  let rankTier = 'Levels 1-4';
+  if (level >= 5 && level <= 15) {
+    rank = 'Role Player';
+    rankTier = 'Levels 5-15';
+  } else if (level >= 16 && level <= 19) {
+    rank = 'Prime Starter';
+    rankTier = 'Levels 16-19';
+  } else if (level >= 20) {
+    rank = 'Hall of Fame Legend';
+    rankTier = 'Levels 20+';
+  }
+
   return (
     <div className="space-y-6">
       {/* Avatar Visual Cabinet */}
@@ -36,10 +53,16 @@ export default function AvatarPage() {
             <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-cyan-600 to-cyan-300 border-2 border-white mb-2" />
             <div className="w-32 h-44 rounded-t-xl bg-slate-800 border-x-4 border-t-4 border-cyan-500/50 relative overflow-hidden">
                {/* Training Jersey */}
-               <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[40px] font-black italic opacity-20 text-white">00</div>
-               {/* Equipped items would go here */}
-               {inventory.some(i => i.type === 'jersey') && (
-                 <div className="absolute inset-0 bg-fuchsia-500/20" />
+               <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[40px] font-black italic opacity-20 text-white">
+                 {String(level).padStart(2, '0')}
+               </div>
+               
+               {/* Equipped items visual changes */}
+               {inventory.some(i => i.itemId === 'mvp_jersey') && (
+                 <div className="absolute inset-0 bg-gradient-to-t from-yellow-500/20 via-transparent to-yellow-500/20 border-t-8 border-yellow-400" />
+               )}
+               {inventory.some(i => i.itemId === 'glow_zooms') && (
+                 <div className="absolute bottom-0 inset-x-0 h-4 bg-cyan-400/30 shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
                )}
             </div>
           </motion.div>
@@ -49,8 +72,8 @@ export default function AvatarPage() {
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-[10px] font-black uppercase text-cyan-400 tracking-widest">Global Ranking</p>
-              <h2 className="text-2xl font-black italic uppercase italic leading-none">{userData?.level || 'UNDRAFTED SCRUB'}</h2>
+              <p className="text-[10px] font-black uppercase text-cyan-400 tracking-widest">Global Ranking ({rankTier})</p>
+              <h2 className="text-2xl font-black italic uppercase leading-none">{rank}</h2>
             </div>
             <div className="text-right">
               <p className="text-[10px] font-black uppercase opacity-60">Season Streak</p>

@@ -17,16 +17,16 @@ export default function RewardShop() {
       type: 'sneakers', 
       icon: '👟', 
       bonus: '+15 Speed',
-      description: 'Engineered for high-intensity study sessions.'
+      description: 'Engineered for high-intensity drills.'
     },
     { 
-      id: 'neon_thread', 
-      name: 'Neon Thread Jersey', 
+      id: 'mvp_jersey', 
+      name: 'MVP Gold Jersey', 
       price: 1500, 
       type: 'jersey', 
       icon: '🎽', 
       bonus: '+10 Intelligence',
-      description: 'Luminous fiber for ultimate visibility.'
+      description: 'Worn by certified focus-mode champions.'
     },
     { 
       id: 'clutch_bands', 
