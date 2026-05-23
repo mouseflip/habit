@@ -51,11 +51,18 @@ export default function RewardShop() {
   const handlePurchase = async (item: any) => {
     if (userData?.gold >= item.price) {
       await buyItem(item);
+      window.dispatchEvent(new CustomEvent('app-toast', { 
+        detail: { message: `🛍️ PURCHASED & EQUIPPED: ${item.name}! ${item.bonus} unlocked.`, type: "success" } 
+      }));
       confetti({
         particleCount: 150,
         spread: 70,
         origin: { y: 0.6 }
       });
+    } else {
+      window.dispatchEvent(new CustomEvent('app-toast', { 
+        detail: { message: `❌ INSUFFICIENT GOLD: Needs ${item.price} G, you only have ${userData?.gold || 0} G`, type: "info" } 
+      }));
     }
   };
 

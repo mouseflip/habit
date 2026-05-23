@@ -52,6 +52,7 @@ export default function HabitTracker() {
     await updateHabit(type, newValue, target);
 
     // Dynamic Game State Update: If they complete a habit, give them gold booster
+    const label = type.toUpperCase().replace('_', ' ');
     if (newValue >= target && current < target) {
       const currentGold = userData?.gold || 0;
       const currentXP = userData?.xp || 0;
@@ -59,11 +60,18 @@ export default function HabitTracker() {
         gold: currentGold + 30,
         xp: currentXP + 50
       });
+      window.dispatchEvent(new CustomEvent('app-toast', { 
+        detail: { message: `🏆 DRILL COMPLETED! ${label} TARGET REACHED. +30 Gold & +50 XP!`, type: "success" } 
+      }));
       confetti({
         particleCount: 40,
         spread: 30,
         origin: { y: 0.8 }
       });
+    } else {
+      window.dispatchEvent(new CustomEvent('app-toast', { 
+        detail: { message: `Progress updated: ${label} is now ${newValue}/${target}`, type: "info" } 
+      }));
     }
   };
 

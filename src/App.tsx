@@ -9,7 +9,7 @@ import HabitTracker from './components/HabitTracker';
 import AvatarPage from './components/AvatarPage';
 import RewardShop from './components/RewardShop';
 import WeeklyReview from './components/WeeklyReview';
-import { Gamepad2, Microscope, Zap, Database, User, Settings, LogOut, TrendingUp, BookOpen, LogIn, ShoppingBag, LayoutGrid, Calendar } from 'lucide-react';
+import { Gamepad2, Microscope, Zap, Database, User, Settings, LogOut, TrendingUp, BookOpen, LogIn, ShoppingBag, LayoutGrid, Calendar, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import confetti from 'canvas-confetti';
 
@@ -26,6 +26,27 @@ function Dashboard() {
   const [activeTab, setActiveTab] = useState<'hub' | 'avatar' | 'shop' | 'weekly' | 'study' | 'settings'>('hub');
   const [lastResult, setLastResult] = useState<LogEntry | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+
+  useEffect(() => {
+    const handleToastEvent = (e: any) => {
+      setToast({
+        message: e.detail.message,
+        type: e.detail.type || 'info'
+      });
+    };
+    window.addEventListener('app-toast' as any, handleToastEvent);
+    return () => window.removeEventListener('app-toast' as any, handleToastEvent);
+  }, []);
+
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => {
+        setToast(null);
+      }, 3200);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Derived Values
   const gold = userData?.gold || 0;
@@ -55,6 +76,9 @@ function Dashboard() {
             spread: 70,
             origin: { y: 0.6 }
           });
+          window.dispatchEvent(new CustomEvent('app-toast', { 
+            detail: { message: "SWISH! Analytics shot successful! +200G", type: "success" } 
+          }));
           await updateGameStats({
             gold: gold + 200,
             xp: xp + 500,
@@ -62,6 +86,9 @@ function Dashboard() {
             tacticalIntelligence: (userData?.tacticalIntelligence || 0) + 1
           });
         } else {
+          window.dispatchEvent(new CustomEvent('app-toast', { 
+            detail: { message: "BRICK! Shot missed, -10 HP fatigue penalty", type: "info" } 
+          }));
           await updateGameStats({
             hp: Math.max(0, hp - 10),
             streak: 0
@@ -153,7 +180,7 @@ function Dashboard() {
             </div>
           </header>
 
-          <main className="flex-1 overflow-y-auto pb-32">
+          <main className="flex-1 overflow-y-auto pb-36">
             <AnimatePresence mode="wait">
               {activeTab === 'hub' && (
                 <motion.div 
@@ -189,33 +216,59 @@ function Dashboard() {
                     </div>
                     <button 
                       onClick={logout}
-                      className="w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-black uppercase text-xs hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2"
+                      className="w-full py-4 rounded-2xl bg-red-500/10 text-red-500 font-black uppercase text-xs hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 active:scale-95 duration-100 ease-in-out"
                     >
                       <LogOut className="w-4 h-4" />
                       Terminate Session
                     </button>
-                  </div>
+                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </main>
 
-          <nav className={`fixed bottom-0 left-0 right-0 h-24 px-6 flex items-center justify-between z-40 border-t backdrop-blur-xl
-            ${theme === 'gamer' ? 'bg-slate-950/80 border-white/5' : 'bg-white/80 border-stone-100'}`}>
+          {/* Floating Toast Notification Chamber */}
+          <AnimatePresence>
+            {toast && (
+              <motion.div
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                className="fixed bottom-28 left-6 right-6 z-50 flex justify-center pointer-events-none"
+              >
+                <div className={`px-4 py-3 rounded-2xl shadow-[0_10px_25px_rgba(0,0,0,0.5)] border-2 flex items-center gap-2 max-w-sm text-center font-bold text-xs uppercase tracking-tight
+                  ${toast.type === 'success' 
+                    ? 'bg-emerald-950/90 border-emerald-500 text-emerald-400' 
+                    : 'bg-slate-900/90 border-cyan-500 text-cyan-400'}`}
+                >
+                  <Sparkles className="w-4 h-4 shrink-0 animate-spin" />
+                  <span>{toast.message}</span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <nav className={`fixed bottom-0 left-0 right-0 h-28 pb-4 px-4 flex items-center justify-between z-40 border-t backdrop-blur-xl
+            ${theme === 'gamer' ? 'bg-slate-950/90 border-white/5' : 'bg-white/90 border-stone-100'}`}>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex flex-col items-center justify-center gap-1 transition-all
+                onClick={() => {
+                  setActiveTab(tab.id as any);
+                  window.dispatchEvent(new CustomEvent('app-toast', { 
+                    detail: { message: `NAVIGATED TO ${tab.label.toUpperCase()}`, type: "info" } 
+                  }));
+                }}
+                className={`flex flex-col items-center justify-center gap-1 transition-all flex-1 py-2 rounded-2xl active:scale-95 duration-100 ease-in-out cursor-pointer min-h-[48px]
                   ${activeTab === tab.id 
-                    ? (theme === 'gamer' ? 'text-cyan-400' : 'text-stone-900') 
+                    ? (theme === 'gamer' ? 'text-cyan-400 font-extrabold' : 'text-stone-900 font-extrabold') 
                     : 'text-stone-400/50 hover:text-stone-400'
                   }`}
               >
-                <div className={`p-2 rounded-xl transition-all ${activeTab === tab.id ? (theme === 'gamer' ? 'bg-cyan-500/10' : 'bg-stone-100') : ''}`}>
+                <div className={`p-2.5 rounded-xl transition-all ${activeTab === tab.id ? (theme === 'gamer' ? 'bg-cyan-500/10' : 'bg-stone-100') : ''}`}>
                   <tab.icon className="w-5 h-5" />
                 </div>
-                <span className="text-[8px] font-black uppercase tracking-tighter">{tab.label.split(' ')[0]}</span>
+                <span className="text-[8px] font-black uppercase tracking-tighter sm:block hidden">{tab.label.split(' ')[0]}</span>
               </button>
             ))}
           </nav>
